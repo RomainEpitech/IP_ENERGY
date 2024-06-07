@@ -49,6 +49,11 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
+    public function absences()
+    {
+        return $this->hasMany(Absence::class);
+    }
+    
     public function getJWTIdentifier()
     {
         return $this->getKey();
