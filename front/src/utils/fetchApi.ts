@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+
 export interface ApiResponse<T> {
   access_token?: string;
   success: boolean;
@@ -30,26 +31,30 @@ const handleResponse = <T>(response: AxiosResponse<T>): ApiResponse<any> => {
   return { success: true, data: response.data };
 };
 
-const fetchApi = async (method: string, endpoint: string, data?: any, headers?: any) => {
+const fetchApi = async (method: string, endpoint: string, data?: any, headers?: any): Promise<ApiResponse<any>> => {
   const baseUrl = 'http://127.0.0.1:8000/api';
 
   try {
-      const response = await fetch(`${baseUrl}${endpoint}`, {
-          method,
-          headers: {
-              'Content-Type': 'application/json',
-              ...headers,
-          },
-          body: data ? JSON.stringify(data) : null,
-      });
+    const response = await fetch(`${baseUrl}${endpoint}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers,
+      },
+      body: data ? JSON.stringify(data) : null,
+    });
 
-      const result = await response.json();
-      if (!response.ok) {
-          return { success: false, error: result.message };
-      }
-      return { success: true, data: result };
+    const result = await response.json();
+    if (!response.ok) {
+      return { success: false, error: result.message };
+    }
+    return { success: true, data: result };
   } catch (error) {
-      return { success: false, error: error.message };
+    let errorMessage = 'Unknown error';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return { success: false, error: errorMessage };
   }
 };
 

@@ -140,14 +140,17 @@ const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ visible, onCl
                 'Content-Type': 'application/json',
             });
 
-            if (response) {
+
+            if (response.success) {
                 console.log('Form submitted:', data);
+                alert('Demande envoyée avec succès.');
                 onClose();
             } else {
-                alert('Erreur lors de l\'envoi de la demande.')
+                // setError(`Erreur: ${response.error}`);
+                alert('Vous avez déjà une demande pour cette période.')
             }
         } catch (error) {
-            setError(`Erreur: ${error}`);
+            setError(`Erreur: ${error.message}`);
         }
     };
 
