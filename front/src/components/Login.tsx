@@ -70,6 +70,9 @@ const Login: React.FC = () => {
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
                 <Text style={styles.buttonText}>Connexion</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Text style={styles.backButtonText}>Retour</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -116,6 +119,13 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    backButton: {
+        marginTop: 20,
+    },
+    backButtonText: {
+        color: '#007bff',
+        fontSize: 16,
     },
 });
 

@@ -1,7 +1,4 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-
-const BASE_URL = 'http://127.0.0.1:8000/api';
-
 export interface ApiResponse<T> {
   access_token?: string;
   success: boolean;

@@ -6,6 +6,7 @@ import Login from './src/components/Login';
 import HomePage from './src/screens/HomePage';
 import ProtectedRoute from './src/security/protectedRoutes';
 import Profile from './src/screens/ProfilePage';
+import RegisterPage from './src/components/Register';
 
 const Stack = createStackNavigator();
 
@@ -15,6 +16,7 @@ const App: React.FC = () => {
             <NavigationContainer>
                 <Stack.Navigator initialRouteName="Home">
                     <Stack.Screen name="Login" component={Login} />
+                    <Stack.Screen name="Register" component={RegisterPage} />
                     <Stack.Screen name="Home" component={HomePage} />
                     <Stack.Screen name="Profile">
                         {() => (
