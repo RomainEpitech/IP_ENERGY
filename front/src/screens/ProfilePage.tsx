@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity
 import { useAuth } from '../utils/authContext';
 import fetchApi from '../utils/fetchApi';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AbsenceRequestModal from '../components/absenceRequestModal';
 
 const absenceImage = require('../public/absences.png');
 
@@ -12,6 +13,7 @@ const Profile: React.FC = () => {
     const [absences, setAbsences] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -84,7 +86,7 @@ const Profile: React.FC = () => {
                         <Ionicons name="settings-outline" size={30} color="white" style={styles.icon} />
                     </View>
                     <View style={styles.absencesContainer}>
-                        <TouchableOpacity style={styles.absenceButton}>
+                        <TouchableOpacity style={styles.absenceButton} onPress={() => setModalVisible(true)}>
                             <Image source={absenceImage} style={styles.buttonImage} />
                             <Text style={styles.buttonText}>Demande d'absence</Text>
                         </TouchableOpacity>
@@ -108,6 +110,10 @@ const Profile: React.FC = () => {
                     </View>
                 </>
             )}
+            <AbsenceRequestModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+            />
         </ScrollView>
     );
 };
