@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, TextInput } from 'react-native';
+import fetchApi from '../utils/fetchApi';
+import { useAuth } from '../utils/authContext';
 
 interface AbsenceRequestModalProps {
     visible: boolean;
@@ -8,12 +10,14 @@ interface AbsenceRequestModalProps {
 
 const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ visible, onClose }) => {
     const opacity = useRef(new Animated.Value(0)).current;
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+    const [start_date, setStartDate] = useState('');
+    const [end_date, setEndDate] = useState('');
     const [reason, setReason] = useState('');
     const [startError, setStartError] = useState('');
     const [endError, setEndError] = useState('');
+    const [reasonError, setReasonError] = useState('');
     const [error, setError] = useState('');
+    const { token } = useAuth();
 
     useEffect(() => {
         if (visible) {
@@ -38,6 +42,7 @@ const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ visible, onCl
         setReason('');
         setStartError('');
         setEndError('');
+        setReasonError('');
         setError('');
     };
 
@@ -58,6 +63,11 @@ const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ visible, onCl
             return 'Date invalide';
         }
 
+        const currentDate = new Date();
+        if (date < currentDate.setHours(0, 0, 0, 0)) {
+            return 'La date ne peut pas être antérieure à la date actuelle.';
+        }
+
         return '';
     };
 
@@ -66,10 +76,10 @@ const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ visible, onCl
         const error = isValidDate(date);
         setStartError(error);
 
-        if (endDate && !error && new Date(endDate) < new Date(date)) {
+        if (end_date && !error && new Date(end_date) < new Date(date)) {
             setEndError('La date de fin ne peut pas être antérieure à la date de début.');
-        } else {
-            setEndError(isValidDate(endDate));
+        } else if (end_date) {
+            setEndError(isValidDate(end_date));
         }
 
         setError('');
@@ -80,7 +90,7 @@ const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ visible, onCl
         const error = isValidDate(date);
         setEndError(error);
 
-        if (!error && new Date(date) < new Date(startDate)) {
+        if (!error && start_date && new Date(date) < new Date(start_date)) {
             setEndError('La date de fin ne peut pas être antérieure à la date de début.');
         }
 
@@ -88,30 +98,57 @@ const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ visible, onCl
     };
 
     const handleReasonChange = (text: string) => {
-        if (text.length <= 255) {
-            setReason(text);
+        setReason(text);
+        if (text.length === 0) {
+            setReasonError('Le motif ne peut pas être vide.');
+        } else if (text.length > 255) {
+            setReasonError('Le motif ne peut pas dépasser 255 caractères.');
+        } else {
+            setReasonError('');
         }
     };
 
-    const handleSend = () => {
-        const startValidationError = isValidDate(startDate);
-        const endValidationError = isValidDate(endDate);
+    const handleSend = async () => {
+        const startValidationError = isValidDate(start_date);
+        const endValidationError = isValidDate(end_date);
+        const reasonValidationError = reason.length === 0 ? 'Le motif ne peut pas être vide.' : '';
 
-        if (startValidationError || endValidationError) {
+        if (startValidationError || endValidationError || reasonValidationError) {
             setStartError(startValidationError);
             setEndError(endValidationError);
+            setReasonError(reasonValidationError);
             setError('Corrigez les erreurs avant de soumettre.');
             return;
         }
 
-        if (new Date(endDate) < new Date(startDate)) {
+        if (new Date(end_date) < new Date(start_date)) {
             setError('La date de fin ne peut pas être antérieure à la date de début.');
             return;
         }
 
         setError('');
-        console.log('Form submitted:', { startDate, endDate, reason });
-        onClose();
+
+        const data = {
+            start_date: start_date,
+            end_date: end_date,
+            reason: reason,
+        };
+
+        try {
+            const response = await fetchApi('POST', '/absences', data, {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            });
+
+            if (response) {
+                console.log('Form submitted:', data);
+                onClose();
+            } else {
+                alert('Erreur lors de l\'envoi de la demande.')
+            }
+        } catch (error) {
+            setError(`Erreur: ${error}`);
+        }
     };
 
     return (
@@ -127,7 +164,7 @@ const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ visible, onCl
                     <TextInput
                         style={[styles.input, startError ? styles.inputError : null]}
                         placeholder="Date de début (YYYY-MM-DD)"
-                        value={startDate}
+                        value={start_date}
                         onChangeText={handleStartDateChange}
                         placeholderTextColor="#aaa"
                     />
@@ -135,13 +172,13 @@ const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ visible, onCl
                     <TextInput
                         style={[styles.input, endError ? styles.inputError : null]}
                         placeholder="Date de fin (YYYY-MM-DD)"
-                        value={endDate}
+                        value={end_date}
                         onChangeText={handleEndDateChange}
                         placeholderTextColor="#aaa"
                     />
                     {endError ? <Text style={styles.errorText}>{endError}</Text> : null}
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input, reasonError ? styles.inputError : null]}
                         placeholder="Motif"
                         value={reason}
                         onChangeText={handleReasonChange}
@@ -149,6 +186,7 @@ const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ visible, onCl
                         multiline
                     />
                     <Text style={styles.charCount}>{reason.length}/255</Text>
+                    {reasonError ? <Text style={styles.errorText}>{reasonError}</Text> : null}
                     {error ? <Text style={styles.errorText}>{error}</Text> : null}
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
