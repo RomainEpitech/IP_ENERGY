@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useAuth } from '../utils/authContext';
 import fetchApi from '../utils/fetchApi';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+const absenceImage = require('../public/absences.png');
+
 const Profile: React.FC = () => {
     const { token } = useAuth();
     const [userInfo, setUserInfo] = useState<any>(null);
+    const [absences, setAbsences] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -24,13 +27,33 @@ const Profile: React.FC = () => {
                     setError('Failed to fetch user info.');
                     console.error('Failed to fetch user info:', response.error);
                 }
+            } else {
+                setError('No token found.');
+            }
+        };
+
+        const fetchAbsences = async () => {
+            if (token) {
+                console.log('Fetching absences with token:', token);
+                const response = await fetchApi('GET', '/absences', null, {
+                    Authorization: `Bearer ${token}`,
+                });
+                console.log('Absences response:', response);
+                if (response.success) {
+                    setAbsences(response.data.absences);
+                } else {
+                    setError('Failed to fetch absences.');
+                    console.error('Failed to fetch absences:', response.error);
+                }
                 setLoading(false);
             } else {
                 setError('No token found.');
                 setLoading(false);
             }
         };
+
         fetchUserInfo();
+        fetchAbsences();
     }, [token]);
 
     if (loading) {
@@ -49,6 +72,9 @@ const Profile: React.FC = () => {
         );
     }
 
+    // Filter and limit the absences
+    const filteredAbsences = absences.filter(absence => absence.status_id === 1).slice(0, 3);
+
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             {userInfo && (
@@ -57,16 +83,28 @@ const Profile: React.FC = () => {
                         <Text style={styles.welcomeText}>Bonjour {userInfo.firstname} 👋</Text>
                         <Ionicons name="settings-outline" size={30} color="white" style={styles.icon} />
                     </View>
-                    <View style={styles.infoContainer}>
-                        <Text style={styles.title}>Profile</Text>
-                        <Text style={styles.label}>Email:</Text>
-                        <Text style={styles.info}>{userInfo.email}</Text>
-                        <Text style={styles.label}>Firstname:</Text>
-                        <Text style={styles.info}>{userInfo.firstname}</Text>
-                        <Text style={styles.label}>Name:</Text>
-                        <Text style={styles.info}>{userInfo.name}</Text>
-                        <Text style={styles.label}>Status:</Text>
-                        <Text style={styles.info}>{userInfo.admin ? 'Administrateur' : 'Employé'}</Text>
+                    <View style={styles.absencesContainer}>
+                        <TouchableOpacity style={styles.absenceButton}>
+                            <Image source={absenceImage} style={styles.buttonImage} />
+                            <Text style={styles.buttonText}>Demande d'absence</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.listButton}>
+                            <Text style={styles.buttonText}>📂 Mes absences</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.requestsContainer}>
+                        <Text style={styles.title}>Mes demandes en cours</Text>
+                        {filteredAbsences.length > 0 ? (
+                            filteredAbsences.map((absence) => (
+                                <View key={absence.id} style={styles.absenceItem}>
+                                    <Text style={styles.label}>Date de début: <Text style={styles.info}>{absence.start_date}</Text></Text>
+                                    <Text style={styles.label}>Date de fin: <Text style={styles.info}>{absence.end_date}</Text></Text>
+                                    <Text style={styles.label}>Statut: <Text style={styles.info}>{absence.status.status}</Text></Text>
+                                </View>
+                            ))
+                        ) : (
+                            <Text style={styles.noRequestsText}>Aucune demande en cours.</Text>
+                        )}
                     </View>
                 </>
             )}
@@ -81,7 +119,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f4f7',
     },
     scrollContainer: {
-        padding: 20
+        padding: 20,
+        alignItems: 'center',
     },
     welcomeContainer: {
         backgroundColor: '#007bff',
@@ -100,7 +139,42 @@ const styles = StyleSheet.create({
     icon: {
         marginLeft: 10,
     },
-    infoContainer: {
+    absencesContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+    },
+    absenceButton: {
+        backgroundColor: 'orange',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        width: '45%',
+        flexDirection: 'row',
+    },
+    listButton: {
+        backgroundColor: 'blue',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        width: '45%',
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginLeft: 10,
+    },
+    buttonImage: {
+        width: 24,
+        height: 24,
+    },
+    errorText: {
+        fontSize: 18,
+        color: 'red',
+        textAlign: 'center',
+    },
+    requestsContainer: {
         backgroundColor: 'white',
         padding: 20,
         borderRadius: 10,
@@ -111,6 +185,7 @@ const styles = StyleSheet.create({
         elevation: 5,
         width: '100%',
         alignItems: 'center',
+        marginTop: 20,
     },
     title: {
         fontSize: 24,
@@ -130,9 +205,16 @@ const styles = StyleSheet.create({
         color: '#666',
         marginBottom: 10,
     },
-    errorText: {
-        fontSize: 18,
-        color: 'red',
+    absenceItem: {
+        marginBottom: 20,
+        padding: 15,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 10,
+        width: '100%',
+    },
+    noRequestsText: {
+        fontSize: 16,
+        color: '#666',
         textAlign: 'center',
     },
 });
