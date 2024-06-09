@@ -37,6 +37,14 @@ class AdminController extends Controller
         return response()->json(['users' => $result], 200);
     }
 
+    public function listUsers()
+    {
+        $users = User::all();
+
+        return response()->json(['users' => $users], 200);
+    }
+
+
     public function updateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [

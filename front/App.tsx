@@ -9,6 +9,7 @@ import Profile from './src/screens/ProfilePage';
 import RegisterPage from './src/components/Register';
 import AbsencesScreen from './src/screens/AbsenceScreen';
 import AdminAbsencesScreen from './src/screens/AdminAbsencesScreen';
+import AdminUsersScreen from './src/screens/AdminUserScreen';
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,13 @@ const App: React.FC = () => {
                         {() => (
                             <ProtectedRoute>
                                 <AdminAbsencesScreen />
+                            </ProtectedRoute>
+                        )}
+                    </Stack.Screen>
+                    <Stack.Screen name="AdminUser">
+                        {() => (
+                            <ProtectedRoute>
+                                <AdminUsersScreen />
                             </ProtectedRoute>
                         )}
                     </Stack.Screen>

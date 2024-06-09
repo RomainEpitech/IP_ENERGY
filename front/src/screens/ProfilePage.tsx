@@ -129,7 +129,7 @@ const Profile: React.FC = () => {
                             <Animatable.View animation="fadeInUp" style={styles.adminContainer}>
                                 <Text style={styles.adminTitle}>Administration</Text>
                                 <View style={styles.adminButtonsContainer}>
-                                    <TouchableOpacity style={styles.adminButton}>
+                                    <TouchableOpacity style={styles.adminButton} onPress={() => navigation.navigate('AdminUser')}>
                                         <Text style={styles.buttonText}>Gérer les utilisateurs</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.adminButton} onPress={() => navigation.navigate('AdminAbsence')}>

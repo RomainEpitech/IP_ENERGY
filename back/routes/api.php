@@ -23,6 +23,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/admin/absences', [AdminController::class, 'adminIndex']);
         Route::put('/admin/absences/{id}/status', [AdminController::class, 'updateStatus']);
 
+        Route::get('/admin/users', [AdminController::class, 'listUsers']);
         Route::put('/admin/users/{id}', [AdminController::class, 'updateUser']);
         Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
     });
