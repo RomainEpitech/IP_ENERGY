@@ -5,10 +5,14 @@ import fetchApi from '../utils/fetchApi';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AbsenceRequestModal from '../components/absenceRequestModal';
 import SettingsModal from '../components/SettingModal';
+import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Animatable from 'react-native-animatable';
 
 const absenceImage = require('../public/absences.png');
 
 const Profile: React.FC = () => {
+    const navigation = useNavigation();
     const { token, logout } = useAuth();
     const [userInfo, setUserInfo] = useState<any>(null);
     const [absences, setAbsences] = useState<any[]>([]);
@@ -57,7 +61,7 @@ const Profile: React.FC = () => {
     if (loading) {
         return (
             <View style={styles.container}>
-                <ActivityIndicator size="large" color="#0000ff" />
+                <ActivityIndicator size="large" color="#ffffff" />
             </View>
         );
     }
@@ -82,59 +86,63 @@ const Profile: React.FC = () => {
     const filteredAbsences = absences.filter(absence => absence.status_id === 1).slice(0, 3);
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-            {userInfo && (
-                <>
-                    <View style={styles.welcomeContainer}>
-                        <Text style={styles.welcomeText}>Bonjour {userInfo.firstname} 👋</Text>
-                        <TouchableOpacity onPress={() => setSettingsVisible(true)}>
-                            <Ionicons name="settings-outline" size={30} color="white" style={styles.icon} />
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.absencesContainer}>
-                        <TouchableOpacity style={styles.absenceButton} onPress={() => setModalVisible(true)}>
-                            <Image source={absenceImage} style={styles.buttonImage} />
-                            <Text style={styles.buttonText}>Demande d'absence</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.listButton}>
-                            <Text style={styles.buttonText}>📂 Mes absences</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.requestsContainer}>
-                        <Text style={styles.title}>Mes demandes en cours</Text>
-                        {filteredAbsences.length > 0 ? (
-                            filteredAbsences.map((absence) => (
-                                <View key={absence.id} style={styles.absenceItem}>
-                                    <Text style={styles.label}>Date de début: <Text style={styles.info}>{absence.start_date}</Text></Text>
-                                    <Text style={styles.label}>Date de fin: <Text style={styles.info}>{absence.end_date}</Text></Text>
-                                    <Text style={styles.label}>Statut: <Text style={styles.info}>{absence.status.status}</Text></Text>
-                                </View>
-                            ))
-                        ) : (
-                            <Text style={styles.noRequestsText}>Aucune demande en cours.</Text>
-                        )}
-                    </View>
-                </>
-            )}
-            <AbsenceRequestModal
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-            />
-            <SettingsModal
-                visible={settingsVisible}
-                onClose={() => setSettingsVisible(false)}
-                onLogout={handleLogout}
-                onEditProfile={handleEditProfile}
-            />
-        </ScrollView>
+        <LinearGradient colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                {userInfo && (
+                    <>
+                        <Animatable.View animation="fadeInDown" style={styles.welcomeContainer}>
+                            <Text style={styles.welcomeText}>Bonjour {userInfo.firstname} 👋</Text>
+                            <TouchableOpacity onPress={() => setSettingsVisible(true)}>
+                                <Ionicons name="settings-outline" size={30} color="white" style={styles.icon} />
+                            </TouchableOpacity>
+                        </Animatable.View>
+                        <Animatable.View animation="fadeInUp" style={styles.absencesContainer}>
+                            <TouchableOpacity style={styles.absenceButton} onPress={() => setModalVisible(true)}>
+                                <Image source={absenceImage} style={styles.buttonImage} />
+                                <Text style={styles.buttonText}>Demande d'absence</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.listButton} onPress={() => navigation.navigate('AbsencesScreen')}>
+                                <Text style={styles.buttonText}>📂 Mes absences</Text>
+                            </TouchableOpacity>
+                        </Animatable.View>
+                        <Animatable.View animation="fadeInUp" style={styles.requestsContainer}>
+                            <Text style={styles.title}>Mes demandes en cours</Text>
+                            {filteredAbsences.length > 0 ? (
+                                filteredAbsences.map((absence) => (
+                                    <Animatable.View key={absence.id} style={styles.absenceItem} animation="fadeInUp">
+                                        <View style={styles.cardHeader}>
+                                            <Ionicons name="calendar-outline" size={24} color="#4c669f" />
+                                            <Text style={styles.cardTitle}>Absence</Text>
+                                        </View>
+                                        <Text style={styles.label}>Date de début: <Text style={styles.info}>{absence.start_date}</Text></Text>
+                                        <Text style={styles.label}>Date de fin: <Text style={styles.info}>{absence.end_date}</Text></Text>
+                                        <Text style={styles.label}>Statut: <Text style={styles.info}>{absence.status.status}</Text></Text>
+                                    </Animatable.View>
+                                ))
+                            ) : (
+                                <Text style={styles.noRequestsText}>Aucune demande en cours.</Text>
+                            )}
+                        </Animatable.View>
+                    </>
+                )}
+                <AbsenceRequestModal
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                />
+                <SettingsModal
+                    visible={settingsVisible}
+                    onClose={() => setSettingsVisible(false)}
+                    onLogout={handleLogout}
+                    onEditProfile={handleEditProfile}
+                />
+            </ScrollView>
+        </LinearGradient>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#f0f4f7',
     },
     scrollContainer: {
         padding: 20,
@@ -148,6 +156,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     welcomeText: {
         fontSize: 24,
@@ -169,6 +182,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '45%',
         flexDirection: 'row',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     listButton: {
         backgroundColor: 'blue',
@@ -176,6 +194,11 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         width: '45%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     buttonText: {
         color: 'white',
@@ -226,14 +249,30 @@ const styles = StyleSheet.create({
     absenceItem: {
         marginBottom: 20,
         padding: 15,
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#fff',
         borderRadius: 10,
         width: '100%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.3,
+        shadowRadius: 1.41,
+        elevation: 2,
     },
     noRequestsText: {
         fontSize: 16,
         color: '#666',
         textAlign: 'center',
+    },
+    cardHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    cardTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginLeft: 10,
+        color: '#4c669f',
     },
 });
 

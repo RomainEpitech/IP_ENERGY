@@ -7,6 +7,7 @@ import HomePage from './src/screens/HomePage';
 import ProtectedRoute from './src/security/protectedRoutes';
 import Profile from './src/screens/ProfilePage';
 import RegisterPage from './src/components/Register';
+import AbsencesScreen from './src/screens/AbsenceScreen';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,13 @@ const App: React.FC = () => {
                         {() => (
                             <ProtectedRoute>
                                 <Profile />
+                            </ProtectedRoute>
+                        )}
+                    </Stack.Screen>
+                    <Stack.Screen name="AbsencesScreen">
+                        {() => (
+                            <ProtectedRoute>
+                                <AbsencesScreen />
                             </ProtectedRoute>
                         )}
                     </Stack.Screen>
