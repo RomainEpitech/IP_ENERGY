@@ -8,10 +8,9 @@ interface SettingsModalProps {
     visible: boolean;
     onClose: () => void;
     onLogout: () => void;
-    onEditProfile: () => void;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose, onLogout, onEditProfile }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose, onLogout }) => {
     const { token } = useAuth();
     const navigation = useNavigation();
     const translateY = useRef(new Animated.Value(300)).current;
@@ -48,6 +47,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose, onLogou
         }
     };
 
+    const handleEditProfile = () => {
+        onClose();
+        navigation.navigate('UpdateUser');
+    };
+
     return (
         <Modal
             transparent
@@ -58,7 +62,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose, onLogou
             <View style={styles.overlay}>
                 <TouchableOpacity style={styles.overlay} onPress={onClose} />
                 <Animated.View style={[styles.modalContainer, { transform: [{ translateY }] }]}>
-                    <TouchableOpacity style={styles.button} onPress={onEditProfile}>
+                    <TouchableOpacity style={styles.button} onPress={handleEditProfile}>
                         <Text style={styles.buttonText}>Modifier profil</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

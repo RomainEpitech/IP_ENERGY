@@ -61,7 +61,7 @@ const AbsencesScreen: React.FC = () => {
                     onValueChange={(value) => setStatusFilter(value)}
                     items={[
                         { label: 'En attente', value: 1 },
-                        { label: 'Approuvée', value: 2 },
+                        { label: 'Validé', value: 2 },
                         { label: 'Rejetée', value: 3 },
                     ]}
                     value={statusFilter}

@@ -10,6 +10,7 @@ import RegisterPage from './src/components/Register';
 import AbsencesScreen from './src/screens/AbsenceScreen';
 import AdminAbsencesScreen from './src/screens/AdminAbsencesScreen';
 import AdminUsersScreen from './src/screens/AdminUserScreen';
+import UpdateUserScreen from './src/screens/UpdateUserScreen';
 
 const Stack = createStackNavigator();
 
@@ -46,6 +47,13 @@ const App: React.FC = () => {
                         {() => (
                             <ProtectedRoute>
                                 <AdminUsersScreen />
+                            </ProtectedRoute>
+                        )}
+                    </Stack.Screen>
+                    <Stack.Screen name="UpdateUser">
+                        {() => (
+                            <ProtectedRoute>
+                                <UpdateUserScreen />
                             </ProtectedRoute>
                         )}
                     </Stack.Screen>
