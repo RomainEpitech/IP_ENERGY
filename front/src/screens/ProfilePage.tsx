@@ -132,8 +132,8 @@ const Profile: React.FC = () => {
                                     <TouchableOpacity style={styles.adminButton}>
                                         <Text style={styles.buttonText}>Gérer les utilisateurs</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={styles.adminButton}>
-                                        <Text style={styles.buttonText} onPress={() => navigation.navigate('AdminAbsence')}>Voir les demandes</Text>
+                                    <TouchableOpacity style={styles.adminButton} onPress={() => navigation.navigate('AdminAbsence')}>
+                                        <Text style={styles.buttonText}>Voir les demandes</Text>
                                     </TouchableOpacity>
                                 </View>
                             </Animatable.View>

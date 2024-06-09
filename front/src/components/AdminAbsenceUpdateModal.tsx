@@ -26,7 +26,7 @@ const AdminAbsenceUpdateModal: React.FC<AdminAbsenceStatusModalProps> = ({ visib
             
             if (response.success) {
                 onStatusChange(absence.id, status);
-                onRefresh(); // Refresh the data after updating the status
+                onRefresh();
                 Alert.alert('Succès', 'Le statut a été mis à jour avec succès.');
                 onClose();
             } else {
