@@ -83,6 +83,8 @@ const Profile: React.FC = () => {
         setSettingsVisible(false);
     };
 
+    const isAdmin: boolean = userInfo && userInfo.admin === 1;
+
     const filteredAbsences = absences.filter(absence => absence.status_id === 1).slice(0, 3);
 
     return (
@@ -123,6 +125,19 @@ const Profile: React.FC = () => {
                                 <Text style={styles.noRequestsText}>Aucune demande en cours.</Text>
                             )}
                         </Animatable.View>
+                        {isAdmin && (
+                            <Animatable.View animation="fadeInUp" style={styles.adminContainer}>
+                                <Text style={styles.adminTitle}>Administration</Text>
+                                <View style={styles.adminButtonsContainer}>
+                                    <TouchableOpacity style={styles.adminButton}>
+                                        <Text style={styles.buttonText}>Gérer les utilisateurs</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.adminButton}>
+                                        <Text style={styles.buttonText} onPress={() => navigation.navigate('AdminAbsence')}>Voir les demandes</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </Animatable.View>
+                        )}
                     </>
                 )}
                 <AbsenceRequestModal
@@ -273,6 +288,43 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginLeft: 10,
         color: '#4c669f',
+    },
+    adminContainer: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        width: '100%',
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    adminTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: '#333',
+        textAlign: 'center',
+    },
+    adminButtonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+    },
+    adminButton: {
+        backgroundColor: '#007bff',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        width: '45%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
 });
 
