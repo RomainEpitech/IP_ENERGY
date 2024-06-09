@@ -4,30 +4,29 @@ import { useAuth } from '../utils/authContext';
 import fetchApi from '../utils/fetchApi';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AbsenceRequestModal from '../components/absenceRequestModal';
+import SettingsModal from '../components/SettingModal';
 
 const absenceImage = require('../public/absences.png');
 
 const Profile: React.FC = () => {
-    const { token } = useAuth();
+    const { token, logout } = useAuth();
     const [userInfo, setUserInfo] = useState<any>(null);
     const [absences, setAbsences] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [settingsVisible, setSettingsVisible] = useState(false);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
             if (token) {
-                console.log('Fetching user info with token:', token);
                 const response = await fetchApi('GET', '/me', null, {
                     Authorization: `Bearer ${token}`,
                 });
-                console.log('API response:', response);
                 if (response.success) {
                     setUserInfo(response.data);
                 } else {
                     setError('Failed to fetch user info.');
-                    console.error('Failed to fetch user info:', response.error);
                 }
             } else {
                 setError('No token found.');
@@ -36,16 +35,13 @@ const Profile: React.FC = () => {
 
         const fetchAbsences = async () => {
             if (token) {
-                console.log('Fetching absences with token:', token);
                 const response = await fetchApi('GET', '/absences', null, {
                     Authorization: `Bearer ${token}`,
                 });
-                console.log('Absences response:', response);
                 if (response.success) {
                     setAbsences(response.data.absences);
                 } else {
                     setError('Failed to fetch absences.');
-                    console.error('Failed to fetch absences:', response.error);
                 }
                 setLoading(false);
             } else {
@@ -74,7 +70,15 @@ const Profile: React.FC = () => {
         );
     }
 
-    // Filter and limit the absences
+    const handleLogout = () => {
+        logout();
+        setSettingsVisible(false);
+    };
+
+    const handleEditProfile = () => {
+        setSettingsVisible(false);
+    };
+
     const filteredAbsences = absences.filter(absence => absence.status_id === 1).slice(0, 3);
 
     return (
@@ -83,7 +87,9 @@ const Profile: React.FC = () => {
                 <>
                     <View style={styles.welcomeContainer}>
                         <Text style={styles.welcomeText}>Bonjour {userInfo.firstname} 👋</Text>
-                        <Ionicons name="settings-outline" size={30} color="white" style={styles.icon} />
+                        <TouchableOpacity onPress={() => setSettingsVisible(true)}>
+                            <Ionicons name="settings-outline" size={30} color="white" style={styles.icon} />
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.absencesContainer}>
                         <TouchableOpacity style={styles.absenceButton} onPress={() => setModalVisible(true)}>
@@ -113,6 +119,12 @@ const Profile: React.FC = () => {
             <AbsenceRequestModal
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}
+            />
+            <SettingsModal
+                visible={settingsVisible}
+                onClose={() => setSettingsVisible(false)}
+                onLogout={handleLogout}
+                onEditProfile={handleEditProfile}
             />
         </ScrollView>
     );
