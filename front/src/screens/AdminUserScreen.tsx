@@ -73,6 +73,8 @@ const AdminUsersScreen: React.FC = () => {
                             });
                             if (response.success) {
                                 Alert.alert("Succès", "Le compte a été désactivé avec succès.");
+                                console.log("deleted");
+                                
                                 setSelectedUser(null);
                             } else {
                                 Alert.alert("Erreur", response.error);
